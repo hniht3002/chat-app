@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-const userChema = new mongoose.Schema( {
+const userSchema = new mongoose.Schema( {
     email: {
         type: String,
         required: true,
@@ -25,6 +25,14 @@ const userChema = new mongoose.Schema( {
     }
 }, {timestamps: true});
 
-const User = mongoose.model("User", userChema);
+userSchema.pre("save", function (next) {
+    if (!this.profilePic) {
+        const encodedFullName = encodeURIComponent(this.fullName);
+        this.profilePic = `https://avatar.iran.liara.run/username?username=${encodedFullName}`;
+    }
+    next();
+});
+
+const User = mongoose.model("User", userSchema);
 
 export default User;

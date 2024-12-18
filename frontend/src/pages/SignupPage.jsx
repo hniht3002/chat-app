@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useAuthStore } from '../store/useAuthStore'
-import { Eye, EyeOff, Key, Loader2, Mail, MessageSquare, User } from 'lucide-react'
+import { Eye, EyeOff, Key, Loader2, Lock, Mail, MessageSquare, User } from 'lucide-react'
 import {Link, useNavigate} from 'react-router-dom'
 import AuthImagePattern from '../components/AuthImagePattern'
 import toast from 'react-hot-toast'
@@ -92,7 +92,7 @@ const SignupPage = () => {
               </label>
               <div className='relative'>
                 <div className='absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none'>
-                  <Key className="size-5 text-base-content/40" />
+                  <Lock className="size-5 text-base-content/40" />
                 </div>
 
                 <input
