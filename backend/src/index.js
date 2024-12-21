@@ -6,8 +6,8 @@ import { connectDB } from "./lib/db.js"
 import cookieParser from "cookie-parser"
 import {app, server, io} from "./lib/socket.js"
 import cors from 'cors'
-
 import path from "path"
+
 dotenv.config()
 
 app.use(cors({
@@ -27,7 +27,7 @@ const __dirname = path.resolve()
 app.use("/api/auth", authRoutes)
 app.use("/api/messages", messageRoutes)
 
-if(process.env.NODE_ENV === "production") {
+if(process.env.NODE_ENV !== "development") {
     app.use(express.static(path.join(__dirname, "../fronend/dist")))
 
     app.get("*", (req, res) => {
