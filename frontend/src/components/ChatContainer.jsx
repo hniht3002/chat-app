@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 import { useChatStore } from '../store/useChatStore'
 import ChatHeader from './ChatHeader'
 import MessageInput from './MessageInput'
@@ -7,11 +7,25 @@ import { useAuthStore } from '../store/useAuthStore'
 import { formatMessageTime } from '../lib/utils'
 
 function ChatContainer() {
-    const { selectedUser, getMessages, messages, isMessagesLoading } = useChatStore()
+    const { selectedUser, getMessages, messages, isMessagesLoading, subcribeToMessages, unsubcribeFromMessages } = useChatStore()
+    const messageEndRef = useRef()
+    
     const {authUser} = useAuthStore()
     useEffect(() => {
-        getMessages(selectedUser._id)
-    }, [selectedUser._id, getMessages])
+        getMessages(selectedUser._id);
+        subcribeToMessages()
+
+        return () => {
+            unsubcribeFromMessages()
+        }
+
+    }, [selectedUser._id, getMessages, subcribeToMessages, unsubcribeFromMessages])
+
+    useEffect(() => {
+        if(messageEndRef.current && messages) {
+            messageEndRef.current.scrollIntoView({behavior: "smooth"})
+        }
+    }, [messages])
 
     if (isMessagesLoading) return (
         <div className='flex flex-1 flex-col overflow-auto'>
@@ -20,12 +34,14 @@ function ChatContainer() {
             <MessageInput />
         </div>
     )
+    
     return (
         <div className='flex-1 flex flex-col overflow-auto '>
             <ChatHeader />
             <div className="flex-1 overflow-y-auto p-4 space-y-4">
                 {messages.map((message, index) => (
                     <div 
+                        ref={messageEndRef}
                         className={`chat ${message.senderId === authUser._id ? "chat-end" : "chat-start" }`}
                         key={message._id}
                     >
@@ -36,7 +52,7 @@ function ChatContainer() {
                         </div>
 
                         <div className="chat-header mb-1">
-                            <time datetime="" className='text-xs opacity-50 ml-1'>{formatMessageTime(message.createdAt)}</time>
+                            <time dateTime="" className='text-xs opacity-50 ml-1'>{formatMessageTime(message.createdAt)}</time>
                         </div>
 
                         <div className="chat-bubble flex flex-col">

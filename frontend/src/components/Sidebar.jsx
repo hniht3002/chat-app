@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useChatStore } from '../store/useChatStore'
 import SidebarSkeleton from './skeletons/SidebarSkeleton';
 import { User } from 'lucide-react';
@@ -7,9 +7,13 @@ import { useAuthStore } from '../store/useAuthStore';
 function Sidebar() {
   const {getUsers, users, selectedUser, setSelectedUser, isUsersLoading} = useChatStore()
   const {onlineUsers} = useAuthStore()
+
+  const [showOnlineOnly, setShowOnlineOnly]  = useState(false)
   useEffect(() => {
     getUsers()
   }, [getUsers])
+
+  const filteredUsers = showOnlineOnly ? users.filter(user => onlineUsers.includes(user._id)) : users;
 
   if(isUsersLoading) return <SidebarSkeleton />
   
@@ -21,10 +25,21 @@ function Sidebar() {
                 <span className="font-medium hidden lg:block">Contacts</span>
             </div>
             {/* Online filter toogle */}
+            <div className='mt-3 hidden lg:flex items-center gap-2'>
+                <label className='cursor-pointer flex items-center gap-2'>
+                    <input 
+                        type='checkbox' 
+                        checked={showOnlineOnly}
+                        onChange={(e)=> {setShowOnlineOnly(e.target.checked)}}
+                        className='checkbox checkbox-sm'
+                        ></input>
+                        <span className='text-sm'>Show only only</span>
+                </label>
+            </div>
         </div>
 
         <div className='overflow-y-auto w-full py-3'>
-            {users.map((user, index) => (
+            {filteredUsers.map((user, index) => (
                 <button
                     key={index}
                     onClick={() => setSelectedUser(user)}
@@ -38,7 +53,6 @@ function Sidebar() {
                     </div>
 
                     {/* User info */}
-
                     <div className="hidden lg:block text-left min-w-0">
                         <div className="font-medium truncate">{user.fullName}</div>
                         <div className="text-sm text-zinc-400">
@@ -47,6 +61,10 @@ function Sidebar() {
                     </div>
                 </button>
             ))}
+
+            {filteredUsers.length === 0 && (
+                <div className="text-center text-zinc-500 py-4">No online users</div>
+            )}
         </div>
     </aside>
   )
